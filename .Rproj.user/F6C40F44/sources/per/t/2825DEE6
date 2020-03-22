@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1514581484780.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1583685205",
+    "id" : "2825DEE6",
+    "lastKnownWriteTime" : 1514648071,
+    "last_content_update" : 1514648071748,
+    "path" : "C:/Users/Antonia/Desktop/Proiect Analiza Datelor/AnalizaDatelorRJava/incarcaDate.R",
+    "project_path" : "incarcaDate.R",
+    "properties" : {
+        "cursorPosition" : "4,0",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : true,
+    "source_window" : "",
+    "type" : "r_source"
+}

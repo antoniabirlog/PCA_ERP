@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1514637433725.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1380406721",
+    "id" : "EC2510F0",
+    "lastKnownWriteTime" : 1514637446,
+    "last_content_update" : 1514637446637,
+    "path" : "C:/Users/Antonia/Desktop/Proiect Analiza Datelor/AnalizaDatelorRJava/cercCorelatii.R",
+    "project_path" : "cercCorelatii.R",
+    "properties" : {
+        "cursorPosition" : "4,0",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

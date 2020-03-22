@@ -1,0 +1,19 @@
+#extinderea modelului prin noi instante
+fisier.suplimentar = "C:/Users/Antonia/Desktop/Proiect Analiza Datelor/ProiectAD/Date Brute/DateRegiuni.csv"
+tabel.supl = read.csv(file = fisier.suplimentar)
+k.supl = names(tabel.supl)[2:10] #ce variabile voi folosi
+cheie = names(tabel.supl)[1]
+#asignare nume pentru regiuni
+rownames(tabel.supl)=tabel.supl[,cheie]
+Y =  scale(adPackage::naElim(tabel.supl[,k.supl]),center = TRUE,scale = TRUE)
+
+CS = as.matrix(Y)%*%rezultat.ACP$loadings
+
+write.csv(x = CS,file = "C:/Users/Antonia/Desktop/MASTER sem 4/ERP/scripts/ScoruriSuplimentare.csv")
+lista.coord = list(C[,1:2],CS[,1:2])
+names(lista.coord) = c(cheieP,cheie)
+
+
+rGraphics::scatterplot(X = lista.coord, legenda = TRUE,
+                       titlu = "Plot instante - Set suplimentar",titluX = "a1",titluY = "a2")
+

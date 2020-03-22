@@ -1,0 +1,12 @@
+#calcul comunalitati
+#Comunalitati
+R2 = R*R
+write.csv(x = R2,file = "R2.csv")
+Comm=NULL
+for(i in 1:m){
+  Comm = rbind(Comm,cumsum(x = R2[i,]))
+}
+rownames(Comm)=rownames(R)
+write.csv(x = Comm,file = "C:/Users/Antonia/Desktop/Proiect Analiza Datelor/ProiectAD/Comunalitati.csv")
+rGraphics::corelograma1(x = Comm,corelatii = TRUE,titlu = "Corelograma comunalitati")
+ 

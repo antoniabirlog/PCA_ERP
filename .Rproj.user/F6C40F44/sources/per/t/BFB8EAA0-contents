@@ -1,0 +1,214 @@
+#' Functie pentru trasare scatterplot multiplu
+#'
+#' @param X Lista de frame-uri/matrice cu doua coloane (X,Y)
+#' @param titlu Titlul graficului
+#' @param titluX Titlul asociat axei Ox
+#' @param titluY Titlul asociat axei Oy
+#' @param corelatii Valoare logica. Indica desenarea cercului corelatiilor
+#' @param legenda Valoare logica. Indica trasarea legendei
+#' @param asp Valoare logica. Specifica respectarea valorii aspect-ratio
+#' @return Functia nu intoarce nimic.
+#' @export
+scatterplot = function(X,
+                       titlu = "",
+                       titluX = "",
+                       titluY = "",
+                       corelatii = FALSE,
+                       legenda = FALSE,
+                       asp=FALSE) {
+  tryCatch({
+    dev.new(noRStudioGD = TRUE)
+    par(xpd = T)
+    m = length(X)
+    if(corelatii) {
+      xlim=c(-1,1)
+      ylim=c(-1,1)
+      t=seq(0,2*pi,length.out = 100)
+      x = cos(t)
+      y=sin(t)
+    }
+    else {
+      x=numeric(0)
+      y=numeric(0)
+      xlim = c(Inf,-Inf)
+      ylim = c(Inf,-Inf)
+      for (j in 1:m) {
+        xlim[1] = min(xlim[1], min(X[[j]][, 1]))
+        xlim[2] = max(xlim[2], max(X[[j]][, 1]))
+        ylim[1] = min(ylim[1], min(X[[j]][, 2]))
+        ylim[2] = max(ylim[2], max(X[[j]][, 2]))
+      }
+    }
+    plot(x = x,y=y,
+         main = titlu,xlab = titluX,ylab = titluY,
+         xlim = xlim,ylim = ylim,type = "l",asp = asp)
+    culori = rainbow(m)
+    for (j in 1:m) {
+      t = X[[j]]
+      points(x = t[, 1],
+             y = t[, 2],
+             col = culori[j])
+      text(
+        x = t[, 1],
+        y = t[, 2],
+        labels = rownames(t),
+        col = culori[j],
+        pos = 1
+      )
+    }
+    if (legenda) {
+      nume = names(X)
+      if (is.null(nume)) {
+        nume = paste("Seria", 1:m)
+      }
+      legend(locator(1), fill = culori, legend = nume)
+    }
+    if(corelatii){
+      par(xpd=FALSE)
+      abline(h = 0,col="green",lwd=2)
+      abline(v = 0,col="green",lwd=2)
+    }
+  },
+  error = function(e) {
+    stop(paste("Eroare trasare Scatterplot!", e))
+  })
+}
+
+#' Functie pentru trasare grafice linie
+#'
+#' @param X Data frame sau matrice cu distributiile pentru care
+#' se efectueaza trasarea
+#' @param titlu Titlul graficului
+#' @param titluX Titlul asociat axei Ox
+#' @param titluY Titlul asociat axei Oy
+#' @param legenda Valoare logica. Indica trasarea legendei
+#' @return Functia nu intoarce nimic.
+#' @export
+multiLinii = function(X,titlu="",titluX="",titluY="",legenda=FALSE){
+  tryCatch(
+    {
+      dev.new(noRStudioGD = T)
+      ylim = range(X)
+      m = ncol(X)
+      n = nrow(X)
+      culori = rainbow(m)
+      plot(x = X[,1],xlab = titluX,ylab = titluY,main = titlu,type = "n",ylim = ylim,
+           xaxt="n",lwd=2)
+      axis(side = 1,at=1:n,labels = rownames(X),las=2)
+      for(i in 1:m){
+        lines(x = X[,i],col=culori[i],lwd=2)
+      }
+      if(legenda){
+        legend(locator(1),fill = culori,legend = names(X))
+      }
+    },
+    error=function(e){
+      stop(paste("Eroare trasare multilinii!",e))
+    }
+  )
+}
+
+#' Functie pentru trasare corelograma conform psych::cor.plot
+#'
+#' @param x Data frame sau matrice cu primul grup de variabile
+#' sau cu matricea de corelatii
+#' @param y Data frame sau matrice cu al doilea grup de variabile
+#' @param corelatii Valoare logica. Specifica daca R este matrice de corelatii
+#' @param titlu Titlul asociat corelogramei
+#' @return Functia nu intoarce nimic.
+#' @export
+corelograma1 = function(x,y=NULL,corelatii=TRUE,titlu=""){
+  if(!corelatii){
+    if(is.null(y)){
+      R = cor(x)
+    } else {
+      R = cor(x,y)
+    }
+  } else {
+    R = x
+  }
+  dev.new(noRStudioGD = TRUE)
+  psych::cor.plot(r = round(R,digits = 5),main = titlu)
+}
+
+#' Functie pentru trasare corelograma conform corrgram::corrgram
+#'
+#' @param x Data frame sau matrice cu primul grup de variabile
+#' sau cu matricea de corelatii
+#' @param y Data frame sau matrice cu al doilea grup de variabile
+#' @param corelatii Valoare logica. Specifica daca R este matrice de corelatii
+#' @param titlu Titlul asociat corelogramei
+#' @return Functia nu intoarce nimic.
+#' @export
+corelograma2 = function(x,y=NULL,corelatii=TRUE,titlu=""){
+  if(!corelatii){
+    if(is.null(y)){
+      R = cor(x)
+    } else {
+      R = cor(x,y)
+    }
+  } else {
+    R = x
+  }
+  dev.new(noRStudioGD = TRUE)
+  corrgram::corrgram(x = R,lower.panel = corrgram::panel.shade,upper.panel = corrgram::panel.pie,
+                     main=titlu,order = TRUE)
+}
+
+
+#' Functie pentru trasarea unei harti folosind pachetul sf
+#'
+#' @param tabel Tabel din care se preiau date pentru trasare
+#' @param titlu Titlul graficului
+#' @param nr.clase Numarul de clase in care se impart instantele. Daca valoarea
+#' este 0 nu se va face o impartire pe clase
+#' @return Functia nu intoarce nimic
+#' @export
+drawMap = function(tabel,titlu="",nr.clase=10){
+  fisier.shp = choose.files(multi = FALSE,filters = c("Fisiere shp","*.shp"))
+  tabel.spatial = sf::st_read(dsn = fisier.shp)
+  key = select.list(choices = names(tabel.spatial),multiple = FALSE,
+                    title = "Cheie in tabelul spatial",
+                    graphics = TRUE)
+  tabel.spatial.redus=tabel.spatial[,key]
+  colnames(tabel)=c(key,"V")
+  if(!is.numeric(tabel[[1]])){
+    tabel[[1]]=toupper(tabel[[1]])
+  }
+  if(!is.numeric(tabel.spatial.redus[[1]])){
+    tabel.spatial.redus[[1]]=toupper(tabel.spatial.redus[[1]])
+  }
+  if(nr.clase!=0){
+    nr.zecimale=5
+    valori = round(tabel[[2]],nr.zecimale)
+    minim = min(valori)
+    maxim = max(valori)
+    limite = seq(from=minim,to = maxim,by = (maxim-minim)/nr.clase)
+    limite = round(limite,nr.zecimale)
+    intervale = cut(x = valori,breaks = limite,include.lowest = TRUE,dig.lab = nr.zecimale)
+    grupe = levels(intervale)
+    coduri = as.numeric(intervale)
+    tabel[[2]]=coduri
+  }
+  tabel.join = dplyr::left_join(tabel.spatial.redus,tabel)
+  sf::st_geometry(tabel.join)=sf::st_geometry(tabel.spatial)
+  n = nrow(tabel.join)
+  if(nr.clase!=0){
+    culori_grupe = colorRampPalette(c("white","red"))(nr.clase)
+    culori = character(n)
+    culori = culori_grupe[tabel.join$V]
+    dev.new(noRStudioGD = TRUE)
+    par(xpd=TRUE)
+    plot(x = tabel.join[,"V"],main=titlu,col=culori)
+    legend(x = locator(1),legend = grupe,fill = culori_grupe)
+  } else {
+    n = nrow(tabel.join)
+    culori = colorRampPalette(c("white","red"))(n)
+    t.min = min(tabel[,"V"])
+    t.max = max(tabel[,"V"])
+    poz = (tabel.join$V-t.min)/(t.max-t.min)
+    j = 1+as.integer((n-1)*poz)
+    dev.new(noRStudioGD = TRUE)
+    plot(x = tabel.join[,"V"],main=titlu,col=culori[j])
+  }
+}

@@ -1,0 +1,57 @@
+analiza.factoriala = function() {
+  fisier.date = choose.files(multi = FALSE, filters = c("Fisiere csv", "*.csv"))
+  tabel.date = read.csv(file = fisier.date)
+  key = select.list(choice=names(tabel.date), multiple = FALSE, title = "Camp cheie:",
+                    graphics = TRUE)  #selectie simpla, key = identificaor de camp
+  k = select.list(choice=names(tabel.date), multiple = TRUE, title = "Variabile:",
+                  graphics = TRUE)  #selectie MULTIPLA
+  #acum eliminam datele lipsa, daca exista
+  x = adPackage::naElim(t = tabel.date[, k])
+  
+  #instantele nu au nume, si le dam din key
+  rownames(x) = tabel.date[,key]
+  #salvez tabelul de observatii
+  write.csv(x=x, file = "X.csv")
+  
+  #studiul factoriabilitatii
+  #Testul Bartlett si KMO
+  R = cor(x) #matricea de corelatie
+  n = nrow(x)
+  psych::cor.plot(r=R)
+  write.csv(x=R, file="R.csv")
+  test.Bartlett = psych::cortest.bartlett(R=R, n=n)
+  #pragul de semnificatie = pragul incepand de la care se respinge ipoteza = pvalue
+  write.csv(x = test.Bartlett, file="FactorabilitateBartlett.csv")
+  #Calcul KMO
+  KMO = psych::KMO(r = x)
+  #SA SALVAAAAAM
+  write.csv(x=KMO$MSA, file="KMO_global.csv")
+  write.csv(x=KMO$MSAi, file="KMO_variabile.csv")
+  #doar T trece testul in KMO_variabile
+  #Sper sa trecem si noi
+  #enter
+  #Aplicare model cu 2 factori prin functia factanal
+  #acum ceva porno
+  rez1 = factanal(x=x, factors = 2, rotation="none") #Factors = numarul de factori estimati ca fiind semnificativi
+  rez.test = rez1$PVAL # pragul de semnificatie pentru care reprezentarea prin 2 factori este suficienta, adica un test bartlett pentru validarea numarului de factori
+  #Aplicare odeul cu doi factori prin functia fa din psych
+  rez2 = psych::fa(r=x, nfactors = 2, rotate = "none", fm="ml") #Factors = numarul de factori estimati ca fiind semnificativi
+  rez.test_fa = rez2$PVAL # pragul de semnificatie pentru care reprezentarea prin 2 factori este suficienta, adica un test bartlett pentru validarea numarului de factori
+  #scriem cod si marim nfactors pana cand depasim pvalue
+  #identificare numar de factori astfel incatmodelul sa fie descris adecvat de factorii respectivi
+  numar.factori = 1
+  repeat{
+    rez.fa =  psych::fa(r=x, nfactors = numar.factori, rotate = "none", fm="none")
+    p.value = rez.fa$PVAL
+    print(p.value)
+    if(p.value>0.01 && is.na(p.value)){
+      break
+    }
+    numar.factori = numar.factori + 1
+  }
+  
+  print(numar.factori)
+
+    
+}
+
